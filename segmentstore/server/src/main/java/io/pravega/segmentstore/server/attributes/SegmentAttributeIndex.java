@@ -310,7 +310,8 @@ class SegmentAttributeIndex implements AttributeIndex, CacheManager.Client, Auto
                     : appendConditionally(() -> CompletableFuture.completedFuture(serialize(c)), new TimeoutTimer(timeout));
 
             // Update the cache after the operation succeeds.
-            return result.thenAcceptAsync(writeInfo -> updateCache(c, writeInfo.getEndOffset()), this.executor);
+            //return result.thenAcceptAsync(writeInfo -> updateCache(c, writeInfo.getEndOffset()), this.executor);
+            return Futures.toVoid(result);
         }
     }
 
@@ -321,11 +322,11 @@ class SegmentAttributeIndex implements AttributeIndex, CacheManager.Client, Auto
             return CompletableFuture.completedFuture(Collections.emptyMap());
         }
 
-        Map<UUID, Long> cachedValues = getFromCache(keys);
-        if (cachedValues.size() == keys.size()) {
-            // Cache hit.
-            return CompletableFuture.completedFuture(cachedValues);
-        }
+        //        Map<UUID, Long> cachedValues = getFromCache(keys);
+        //        if (cachedValues.size() == keys.size()) {
+        //            // Cache hit.
+        //            return CompletableFuture.completedFuture(cachedValues);
+        //        }
 
         // This will process all attributes anyway so we need not bother with partially filling the result and then selectively
         // picking our values from the result. We'll re-cache all attributes at this point.
@@ -345,11 +346,11 @@ class SegmentAttributeIndex implements AttributeIndex, CacheManager.Client, Auto
     @Override
     public CompletableFuture<Long> get(UUID key, Duration timeout) {
         ensureInitialized();
-        Map<UUID, Long> cachedValues = getFromCache(Collections.singleton(key));
-        if (!cachedValues.isEmpty()) {
-            // Cache hit.
-            return CompletableFuture.completedFuture(cachedValues.get(key));
-        }
+        //        Map<UUID, Long> cachedValues = getFromCache(Collections.singleton(key));
+        //        if (!cachedValues.isEmpty()) {
+        //            // Cache hit.
+        //            return CompletableFuture.completedFuture(cachedValues.get(key));
+        //        }
 
         return readAllSinceLastSnapshot(true, timeout)
                 .thenApply(c -> c.attributes.get(key));
@@ -421,12 +422,12 @@ class SegmentAttributeIndex implements AttributeIndex, CacheManager.Client, Auto
             return r;
         }, this.executor);
 
-        if (cacheValues) {
-            result = result.thenApplyAsync(r -> {
-                updateCache(r, lastReadOffset.get());
-                return r;
-            }, this.executor);
-        }
+        //        if (cacheValues) {
+        //            result = result.thenApplyAsync(r -> {
+        //                updateCache(r, lastReadOffset.get());
+        //                return r;
+        //            }, this.executor);
+        //        }
 
         return Futures.exceptionallyCompose(result,
                 ex -> {
