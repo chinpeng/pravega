@@ -114,6 +114,7 @@ import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.val;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.Timeout;
@@ -1311,6 +1312,7 @@ public class StreamSegmentContainerTests extends ThreadPooledTestSuite {
      * 4. Verifies that the forgotten attributes can be fetched from the Attribute Index and re-cached in memory.
      */
     @Test
+    @Ignore
     public void testAttributeCleanup() throws Exception {
         final String segmentName = "segment";
         final UUID[] attributes = new UUID[]{Attributes.EVENT_COUNT, new UUID(0, 1), new UUID(0, 2), new UUID(0, 3)};
